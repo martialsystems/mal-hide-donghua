@@ -60,7 +60,7 @@ say "== live AniList (production query + hide plan) =="
 if node tests/test_live_anilist.js; then ok "test_live_anilist.js"; else bad "test_live_anilist.js"; fi
 
 say "== static paths =="
-if grep -q 'Hide Chinese animation' popup.html src/popup.js README.md; then
+if grep -q 'Hide non-Japanese listings' popup.html README.md; then
   ok "enable label present"
 else
   bad "missing enable label"
@@ -105,10 +105,15 @@ if grep -q 'document_end' manifest.json; then
 else
   bad "document_end missing"
 fi
-if grep -q 'writeChain' src/background.js && grep -q 'mergeCache' src/background.js && grep -q 'allowChain' src/background.js; then
-  ok "cache and allow writes serialized"
+if grep -q 'writeChain' src/background.js && grep -q 'mergeCache' src/background.js; then
+  ok "cache writes serialized through mergeCache"
 else
   bad "serialized write path missing"
+fi
+if grep -q 'allowChain' src/background.js || grep -q 'ALLOW_PAGE' src/*.js; then
+  bad "title-page allow path must be gone"
+else
+  ok "no title-page allow path"
 fi
 if grep -q 'lookupBody' src/background.js && grep -q 'parseLookupResponse' src/background.js; then
   ok "background uses production AniList parse"
@@ -120,25 +125,35 @@ if grep -q 'graphql.anilist.co' src/shared.js src/background.js docs/PRIVACY_POL
 else
   bad "AniList destination missing from privacy/readme"
 fi
-if grep -q 'BLOCKED = { CN: true, TW: true, HK: true }' src/shared.js; then
-  ok "blocked set is CN/TW/HK"
+if grep -q 'BLOCKED = { CN: true, TW: true, HK: true, KR: true }' src/shared.js; then
+  ok "blocked set is CN/TW/HK/KR"
 else
   bad "blocked set drifted"
 fi
-if grep -n 'BLOCKED = {.*KR' src/shared.js; then
-  bad "Korean is not in the default hide set"
+if grep -q 'KEEP_COUNTRY = { JP: true }' src/shared.js; then
+  ok "only JP is kept"
 else
-  ok "KR not default-blocked"
+  bad "JP keep-set drifted"
 fi
-if grep -q 'malhd-hide' src/content.js src/content.css && grep -q 'malhd-page-hide' src/content.js src/content.css; then
-  ok "card hide and title-page hide both present"
+if grep -q 'isListingPath' src/shared.js src/content.js tests/test_shared.js; then
+  ok "listing-only hide is wired"
+else
+  bad "isListingPath missing"
+fi
+if grep -q 'Niu Lai' tests/test_shared.js; then
+  ok "Niu Lai is a hide title"
+else
+  bad "Niu Lai untested"
+fi
+if grep -q 'malhd-hide' src/content.js src/content.css; then
+  ok "card hide present"
 else
   bad "hide CSS/class missing"
 fi
-if grep -q 'ALLOW_PAGE' src/content.js src/background.js src/shared.js; then
-  ok "Show this page allow path wired"
+if grep -q 'malhd-page-hide' src/content.js src/content.css; then
+  bad "title pages must stay visible"
 else
-  bad "allow-page missing"
+  ok "title pages are not hidden"
 fi
 if grep -q 'MutationObserver' src/content.js && grep -q 'storage.onChanged' src/content.js; then
   ok "rescan on DOM and settings change"

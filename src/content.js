@@ -2,9 +2,9 @@
  * Copyright (c) 2026 Martial Systems LLC. All rights reserved.
  * https://martialsys.net/
  *
- * Isolated world: hide Chinese animation cards from the title language and
- * strong Chinese hosts immediately, then let AniList JP/KR unhide mistakes
- * and AniList CN catch English titles. Fail open when unknown.
+ * Isolated world: hide non-Japanese listing cards on Seasonal, Top, and
+ * Search. Title pages stay visible. AniList JP unhides mistakes; other
+ * AniList countries hide English-titled donghua. Fail open when unknown.
  */
 (function () {
   "use strict";
@@ -14,15 +14,12 @@
 
   var settings = S.defaultSettings();
   var cacheMap = Object.create(null);
-  var allow = Object.create(null);
   var hiddenCount = 0;
-  var pageHidden = false;
   var mutating = false;
   var scanTimer = 0;
   var pendingIds = Object.create(null);
   var inflight = false;
   var failUntil = 0;
-  var bar = null;
 
   function nodeInfo(el) {
     return {
@@ -72,31 +69,12 @@
     return hrefs;
   }
 
-  function nativeFromPage() {
-    var labels = document.querySelectorAll(".dark_text");
-    for (var i = 0; i < labels.length; i++) {
-      var t = (labels[i].textContent || "").replace(/\s+/g, " ").trim();
-      if (t.indexOf("Japanese:") !== 0) continue;
-      var parent = labels[i].parentNode;
-      if (!parent || !parent.textContent) return "";
-      return parent.textContent.replace(/Japanese:/, "").trim();
-    }
-    return "";
-  }
-
-  function pageTitle() {
-    var h = document.querySelector("h1.title-name, h1 strong, h1");
-    return h && h.textContent ? h.textContent.trim() : "";
-  }
-
   function hideOpts(id, meta) {
     meta = meta || {};
     return {
       enabled: settings.enabled,
-      allowed: !!allow[String(id)],
       country: originOf(id),
       title: meta.title || "",
-      nativeTitle: meta.nativeTitle || "",
       hrefs: meta.hrefs || [],
       text: meta.text || "",
     };
@@ -116,51 +94,12 @@
     });
   }
 
-  function ensureBar(id) {
-    if (bar && bar.parentNode) return;
-    bar = document.getElementById("malhd-bar");
-    if (bar) return;
-    bar = document.createElement("div");
-    bar.id = "malhd-bar";
-    var text = document.createElement("span");
-    text.textContent = "Hidden: Chinese animation.";
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "Show this page";
-    btn.addEventListener("click", function (ev) {
-      ev.preventDefault();
-      send({ type: S.MSG.ALLOW_PAGE, id: id }).then(function (res) {
-        if (!res || !res.ok) return;
-        allow[String(id)] = 1;
-        applyPage(id);
-        scan();
-      });
-    });
-    bar.appendChild(text);
-    bar.appendChild(btn);
-    if (document.body) document.body.insertBefore(bar, document.body.firstChild);
-  }
-
-  function removeBar() {
-    var el = bar || document.getElementById("malhd-bar");
-    if (el && el.parentNode) el.parentNode.removeChild(el);
-    bar = null;
-  }
-
-  function applyPage(id) {
-    var side = document.querySelector(".leftside") || document.getElementById("content");
-    var hide = S.decideHide(
-      hideOpts(id, {
-        title: pageTitle(),
-        nativeTitle: nativeFromPage(),
-        hrefs: collectHrefs(side || document),
-        text: "",
-      })
-    );
-    pageHidden = hide;
-    document.documentElement.classList.toggle("malhd-page-hide", hide);
-    if (hide) ensureBar(id);
-    else removeBar();
+  function unhideAll() {
+    mutating = true;
+    var hid = document.querySelectorAll(".malhd-hide");
+    for (var i = 0; i < hid.length; i++) hid[i].classList.remove("malhd-hide");
+    mutating = false;
+    hiddenCount = 0;
   }
 
   function collect() {
@@ -228,29 +167,14 @@
 
   function scan() {
     if (!document.body) return;
-    var pageId = S.malIdFromPath(location.pathname || "");
-    if (!settings.enabled) {
-      mutating = true;
-      var hid = document.querySelectorAll(".malhd-hide");
-      for (var i = 0; i < hid.length; i++) hid[i].classList.remove("malhd-hide");
-      mutating = false;
-      hiddenCount = 0;
-      pageHidden = false;
-      document.documentElement.classList.remove("malhd-page-hide");
-      removeBar();
+    if (!settings.enabled || !S.isListingPath(location.pathname || "")) {
+      unhideAll();
       return;
     }
     var cards = collect();
     var ids = [];
     for (var c = 0; c < cards.length; c++) ids.push(cards[c].id);
-    if (pageId) ids.push(pageId);
     applyCards(cards);
-    if (pageId) applyPage(pageId);
-    else {
-      pageHidden = false;
-      document.documentElement.classList.remove("malhd-page-hide");
-      removeBar();
-    }
     requestUnknown(S.uniqueIds(ids));
   }
 
@@ -283,16 +207,6 @@
           resolve();
         });
       }),
-      new Promise(function (resolve) {
-        try {
-          chrome.storage.session.get(S.ALLOW_KEY, function (data) {
-            allow = (data && data[S.ALLOW_KEY]) || Object.create(null);
-            resolve();
-          });
-        } catch (_err) {
-          resolve();
-        }
-      }),
     ]);
   }
 
@@ -302,8 +216,8 @@
     sendResponse({
       ok: true,
       enabled: !!settings.enabled,
+      listing: S.isListingPath(location.pathname || ""),
       hidden: hiddenCount,
-      pageHidden: pageHidden,
     });
     return true;
   });
@@ -311,10 +225,6 @@
   chrome.storage.onChanged.addListener(function (changes, area) {
     if (area === "sync" && changes[S.SETTINGS_KEY]) {
       settings = S.parseSettings(changes[S.SETTINGS_KEY].newValue);
-      scan();
-    }
-    if (area === "session" && changes[S.ALLOW_KEY]) {
-      allow = changes[S.ALLOW_KEY].newValue || Object.create(null);
       scan();
     }
     if (area === "local" && changes[S.CACHE_KEY]) {

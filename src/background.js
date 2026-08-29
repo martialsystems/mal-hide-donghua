@@ -14,7 +14,6 @@ try {
 
 var S = self.MalHideDonghua;
 var writeChain = Promise.resolve();
-var allowChain = Promise.resolve();
 
 function loadSettings() {
   return chrome.storage.sync.get(S.SETTINGS_KEY).then(function (data) {
@@ -132,30 +131,12 @@ function handleSetEnabled(msg) {
   });
 }
 
-function handleAllowPage(msg) {
-  var id = msg && msg.id ? msg.id | 0 : 0;
-  if (id <= 0) return Promise.resolve({ ok: false, reason: "no-id" });
-  allowChain = allowChain.catch(function () {}).then(function () {
-    return chrome.storage.session.get(S.ALLOW_KEY).then(function (data) {
-      var allow = data[S.ALLOW_KEY] || {};
-      allow[String(id)] = 1;
-      var payload = {};
-      payload[S.ALLOW_KEY] = allow;
-      return chrome.storage.session.set(payload).then(function () {
-        return { ok: true, id: id };
-      });
-    });
-  });
-  return allowChain;
-}
-
 function onMessage(msg, _sender, sendResponse) {
   if (!S || !msg || msg.source !== S.MSG.SOURCE) return;
   var task = null;
   if (msg.type === S.MSG.LOOKUP) task = handleLookup(msg.ids);
   else if (msg.type === S.MSG.GET_SETTINGS) task = handleGetSettings();
   else if (msg.type === S.MSG.SET_ENABLED) task = handleSetEnabled(msg);
-  else if (msg.type === S.MSG.ALLOW_PAGE) task = handleAllowPage(msg);
   if (!task) return;
   task
     .then(function (result) {

@@ -13,7 +13,7 @@
 | **Publisher** | Martial Systems LLC |
 | **Support** | martialsys@gmail.com · [Ko-fi](https://ko-fi.com/martialgames) |
 | **Web** | https://martialsys.net/ |
-| **Version** | 1.1.0 |
+| **Version** | 1.2.0 |
 | **License** | Proprietary: see [LICENSE](LICENSE) and [Terms](docs/TERMS_OF_USE.md) |
 
 **We do not save your data.** Your list and page HTML are not uploaded to Martial Systems LLC. Titles and links are classified on your device. MAL ids are sent to AniList (`https://graphql.anilist.co/`) so Japanese origin can unhide a bad title match, and so English-titled donghua still hide. [Privacy Policy](docs/PRIVACY_POLICY.md).
@@ -26,31 +26,29 @@ Not affiliated with Google LLC, MyAnimeList, or AniList.
 2. Turn on **Developer mode**
 3. **Load unpacked** and choose this folder
 4. Open [MyAnimeList](https://myanimelist.net/)
-5. Reload the tab. Seasonal tiles with pinyin titles (Shiguang Dailiren, Zhu Xian, and the rest) disappear immediately.
+5. Reload the tab. Seasonal, Top, and Search hide non-Japanese listing cards. Open a title URL and that page stays visible.
 
-Toolbar popup: **Hide Chinese animation**. Off leaves the page as MAL shows it. On a hidden title page, **Show this page** keeps that id visible until Chrome exits.
+Toolbar popup: **Hide non-Japanese listings**. Off leaves listings as MAL shows them.
 
 ## What it does
 
-Hide if any of these fire, unless AniList says Japan or Korea:
+On Seasonal, Top, and Search only, hide a listing card if any of these fire, unless AniList says Japan:
 
 | Signal | When |
 |--------|------|
-| Title language | Simplified Chinese in the title, or a pinyin title (`Shiguang Dailiren`, `Zhu Xian`) |
+| Title language | Simplified Chinese in the title, or a pinyin title (`Shiguang Dailiren`, `Niu Lai`) |
 | Strong Chinese hosts | Official/streaming links to Bilibili, Tencent Video (`v.qq.com`), iQIYI, Youku, WeTV |
-| Card text | `Bilibili` / `Tencent` / `iQIYI` / `Youku` in the tile (synopsis source line) |
-| AniList origin | `CN` / `TW` / `HK` for English titles such as To Be Hero X |
+| Card text | `Bilibili` / `Tencent` / `iQIYI` / `Youku` in the tile |
+| AniList origin | Any country other than `JP` (`CN`, `TW`, `HK`, `KR`) |
 
-AniList `JP` or `KR` always wins, so a bad pinyin read of a Japanese title comes back. Baidu Baike and Douban wiki links are ignored: Japanese title pages often have those.
+The anime title page (`/anime/{id}/...`) is never hidden, including Niu Lai. AniList `JP` always wins on listings, so a bad pinyin read of a Japanese title comes back. Baidu Baike and Douban wiki links are ignored.
 
 | Surface | Behavior |
 |---------|----------|
-| Seasonal tiles | `.seasonal-anime` hidden |
-| Top ranking rows | `tr.ranking-list` hidden |
-| Search rows | result `tr` hidden |
-| Home / rec sliders | `li.btn-anime` hidden |
-| Your list rows | `.list-table-data` hidden |
-| Title page | `#content` hidden, with Show this page |
+| Seasonal | non-Japanese tiles hidden |
+| Top | non-Japanese ranking rows hidden |
+| Search | non-Japanese result rows hidden |
+| Title page | shown |
 
 ## Checks
 
@@ -61,7 +59,7 @@ AniList `JP` or `KR` always wins, so a bad pinyin read of a Japanese title comes
 ## Residual limits
 
 - English-titled donghua wait on AniList (To Be Hero X, The Ribbon Hero).
-- A few pinyin titles with no q/x/zh/ong/uan syllable wait on AniList too (Yao Shen Ji).
+- A few pinyin titles with no q/x/zh/ong/uan/iu syllable wait on AniList (Yao Shen Ji).
 - Co-productions use the one country AniList stores.
-- Forum text links are not listing cards, so they stay.
-- After Load unpacked, reload the MAL tab so the content script attaches.
+- Home sliders and your list are left as MAL shows them.
+- After Load unpacked, reload the extension and the MAL tab.

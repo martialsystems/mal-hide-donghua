@@ -5,10 +5,10 @@
  * Pure helpers for Hide Donghua. Content script, service worker, popup,
  * and Node tests all load this file.
  *
- * Hide order: AniList JP/KR always shown; AniList CN/TW/HK hidden;
- * else title language and strong Chinese hosts/text (Bilibili, Tencent
- * Video, iQIYI, Youku). Baidu/Douban wiki links are not enough: Japanese
- * title pages often have those.
+ * Listings (seasonal, top, search): hide non-Japanese cards. Title pages
+ * stay visible. AniList JP always shown; other AniList countries hidden;
+ * else title language and strong Chinese hosts/text. Baidu/Douban wiki
+ * links are not enough: Japanese title pages often have those.
  */
 (function (root) {
   "use strict";
@@ -19,15 +19,13 @@
     GET_SETTINGS: "get-settings",
     SET_ENABLED: "set-enabled",
     GET_COUNTS: "get-counts",
-    ALLOW_PAGE: "allow-page",
   };
 
   var SETTINGS_KEY = "malhd_settings";
   var CACHE_KEY = "malhd_cache";
-  var ALLOW_KEY = "malhd_allow";
 
-  var BLOCKED = { CN: true, TW: true, HK: true };
-  var KEEP_COUNTRY = { JP: true, KR: true };
+  var BLOCKED = { CN: true, TW: true, HK: true, KR: true };
+  var KEEP_COUNTRY = { JP: true };
   var CHUNK = 50;
   var KNOWN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
   var UNKNOWN_TTL_MS = 2 * 24 * 60 * 60 * 1000;
@@ -132,6 +130,15 @@
     if (!path || typeof path !== "string") return 0;
     var m = path.match(/^\/anime\/(\d+)(?:\/|$)/);
     return m ? parseInt(m[1], 10) || 0 : 0;
+  }
+
+  function isListingPath(path) {
+    var p = String(path || "");
+    if (/^\/anime\/\d+/.test(p)) return false;
+    if (/^\/anime\/season(\/|$)/.test(p)) return true;
+    if (p === "/topanime.php" || p.indexOf("/topanime.php") === 0) return true;
+    if (p === "/anime.php" || p.indexOf("/anime.php") === 0) return true;
+    return false;
   }
 
   function uniqueIds(ids) {
@@ -263,6 +270,7 @@
     if (fin === "uang" || fin === "iong" || fin === "iao") return true;
     if (fin === "ong" && init !== "y" && init !== "w" && init !== "") return true;
     if (fin === "uan" && init !== "" && init !== "w") return true;
+    if (fin === "iu") return true;
     return false;
   }
 
@@ -461,7 +469,6 @@
     MSG: MSG,
     SETTINGS_KEY: SETTINGS_KEY,
     CACHE_KEY: CACHE_KEY,
-    ALLOW_KEY: ALLOW_KEY,
     BLOCKED: BLOCKED,
     KEEP_COUNTRY: KEEP_COUNTRY,
     CHUNK: CHUNK,
@@ -473,6 +480,7 @@
     parseSettings: parseSettings,
     malIdFromHref: malIdFromHref,
     malIdFromPath: malIdFromPath,
+    isListingPath: isListingPath,
     uniqueIds: uniqueIds,
     chunkIds: chunkIds,
     classText: classText,

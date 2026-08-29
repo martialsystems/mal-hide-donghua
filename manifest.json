@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Hide Donghua",
-  "version": "1.1.0",
-  "description": "Hides Chinese animation on MyAnimeList from the title language and Chinese streaming links. AniList origin unhides Japanese titles. By Martial Systems LLC. We do not save your data.",
+  "version": "1.2.0",
+  "description": "Hides non-Japanese animation on MyAnimeList Seasonal, Top, and Search. Title pages stay visible. By Martial Systems LLC. We do not save your data.",
   "author": "Martial Systems LLC",
   "homepage_url": "https://martialsys.net/",
   "minimum_chrome_version": "113",

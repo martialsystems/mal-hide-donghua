@@ -23,9 +23,22 @@ assert.strictEqual(S.malIdFromHref(null), 0);
 section("malIdFromPath");
 assert.strictEqual(S.malIdFromPath("/anime/44074"), 44074);
 assert.strictEqual(S.malIdFromPath("/anime/44074/Shiguang_Dailiren"), 44074);
+assert.strictEqual(S.malIdFromPath("/anime/64875/Niu_Lai"), 64875);
 assert.strictEqual(S.malIdFromPath("/anime/season"), 0);
 assert.strictEqual(S.malIdFromPath("/anime.php"), 0);
 assert.strictEqual(S.malIdFromPath("/topanime.php"), 0);
+
+section("isListingPath");
+assert.strictEqual(S.isListingPath("/anime/season"), true);
+assert.strictEqual(S.isListingPath("/anime/season/2026/summer"), true);
+assert.strictEqual(S.isListingPath("/topanime.php"), true);
+assert.strictEqual(S.isListingPath("/topanime.php?type=ona"), true);
+assert.strictEqual(S.isListingPath("/anime.php"), true);
+assert.strictEqual(S.isListingPath("/anime.php?q=niu"), true);
+assert.strictEqual(S.isListingPath("/anime/64875/Niu_Lai"), false);
+assert.strictEqual(S.isListingPath("/anime/64875/Niu_Lai/characters"), false);
+assert.strictEqual(S.isListingPath("/animelist/someone"), false);
+assert.strictEqual(S.isListingPath("/"), false);
 
 section("titleSignal");
 [
@@ -41,6 +54,7 @@ section("titleSignal");
   "Wukong Da Sheng",
   "Jiyi Guanli Ju (2026)",
   "Sanguo Di Yi Bu: Zheng Luoyang",
+  "Niu Lai",
   "时光代理人III",
 ].forEach(function (t) {
   assert.strictEqual(S.titleSignal(t), "cn", t);
@@ -106,6 +120,8 @@ assert.strictEqual(
   }),
   true
 );
+assert.strictEqual(S.decideHide({ title: "Niu Lai", enabled: true }), true);
+assert.strictEqual(S.decideHide({ title: "Dogulwang", country: "KR", enabled: true }), true);
 assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren III", enabled: false }), false);
 assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren III", allowed: true, enabled: true }), false);
 assert.strictEqual(S.isStrongChineseHost("https://www.bilibili.com/bangumi/media/md1"), true);

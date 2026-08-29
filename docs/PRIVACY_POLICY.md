@@ -18,7 +18,7 @@
 | Do we upload your anime list? | **No.** |
 | Do we sell or share personal data with advertisers? | **No.** |
 | Do we run analytics or tracking pixels? | **No.** |
-| What is written to disk? | On/off in `chrome.storage.sync`. MAL id to country cache in `chrome.storage.local`. “Show this page” ids in `chrome.storage.session`. |
+| What is written to disk? | On/off in `chrome.storage.sync`. MAL id to country cache in `chrome.storage.local`. |
 | Who sees MAL ids? | AniList (`https://graphql.anilist.co/`), so the Extension can read `countryOfOrigin`. |
 
 ## 2. Who we are
@@ -40,8 +40,7 @@ On your device the Extension may:
 - Read **MyAnimeList anime ids** from links and the current URL;
 - Send those ids to **AniList GraphQL** (`https://graphql.anilist.co/`) to read `countryOfOrigin` (Japanese origin unhides a bad title match; Chinese origin hides English-titled donghua);
 - Keep id to country pairs in **`chrome.storage.local`** so the same titles are not looked up on every scan;
-- Keep the on/off flag in **`chrome.storage.sync`**;
-- Keep “Show this page” ids in **`chrome.storage.session`** until Chrome exits.
+- Keep the on/off flag in **`chrome.storage.sync`**.
 
 This happens **on your device**, except the AniList lookup. We do **not** operate a backend that receives your URLs, list, or page HTML.
 

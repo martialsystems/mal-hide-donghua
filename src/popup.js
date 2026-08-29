@@ -38,12 +38,12 @@
 
   function loadCounts(tab) {
     if (!tab || typeof tab.id !== "number") {
-      setStatus("Open MyAnimeList to hide Chinese animation.");
+      setStatus("Open MyAnimeList Seasonal, Top, or Search.");
       return;
     }
     var url = tab.url || "";
     if (!/https:\/\/(www\.)?myanimelist\.net\//i.test(url)) {
-      setStatus("Open MyAnimeList to hide Chinese animation.");
+      setStatus("Open MyAnimeList Seasonal, Top, or Search.");
       return;
     }
     chrome.tabs.sendMessage(tab.id, { source: S.MSG.SOURCE, type: S.MSG.GET_COUNTS }, function (res) {
@@ -55,9 +55,11 @@
         setStatus("Off. Listings stay as MAL shows them.");
         return;
       }
-      var n = res.hidden | 0;
-      var extra = res.pageHidden ? " This title page is hidden." : "";
-      setStatus("Hidden on this page: " + n + "." + extra);
+      if (!res.listing) {
+        setStatus("Title pages stay visible. Open Seasonal, Top, or Search to hide non-Japanese listings.");
+        return;
+      }
+      setStatus("Hidden on this page: " + (res.hidden | 0) + ".");
     });
   }
 
