@@ -3,13 +3,13 @@
  * https://martialsys.net/
  *
  * Isolated world: hide non-Japanese listing cards on Seasonal, Top, and
- * Search. Title pages stay visible. AniList JP unhides mistakes; other
- * AniList countries hide English-titled donghua. Fail open when unknown.
+ * Search. Title pages stay visible. AniList JP keeps a card; any other
+ * origin hides it. Japanese title cues keep a card up until AniList answers.
  */
 (function () {
   "use strict";
 
-  var S = window.MalHideDonghua;
+  var S = window.MalJpOnly;
   if (!S) return;
 
   var settings = S.defaultSettings();
@@ -42,8 +42,8 @@
 
   function setHidden(el, hide) {
     if (!el || !el.classList) return;
-    if (hide) el.classList.add("malhd-hide");
-    else el.classList.remove("malhd-hide");
+    if (hide) el.classList.add("maljp-hide");
+    else el.classList.remove("maljp-hide");
   }
 
   function originOf(id) {
@@ -59,24 +59,12 @@
     return node && node.textContent ? node.textContent.trim() : "";
   }
 
-  function collectHrefs(root) {
-    var hrefs = [];
-    if (!root || !root.querySelectorAll) return hrefs;
-    var links = root.querySelectorAll("a[href]");
-    for (var i = 0; i < links.length; i++) {
-      hrefs.push(links[i].href || links[i].getAttribute("href") || "");
-    }
-    return hrefs;
-  }
-
   function hideOpts(id, meta) {
     meta = meta || {};
     return {
       enabled: settings.enabled,
       country: originOf(id),
       title: meta.title || "",
-      hrefs: meta.hrefs || [],
-      text: meta.text || "",
     };
   }
 
@@ -96,8 +84,8 @@
 
   function unhideAll() {
     mutating = true;
-    var hid = document.querySelectorAll(".malhd-hide");
-    for (var i = 0; i < hid.length; i++) hid[i].classList.remove("malhd-hide");
+    var hid = document.querySelectorAll(".maljp-hide");
+    for (var i = 0; i < hid.length; i++) hid[i].classList.remove("maljp-hide");
     mutating = false;
     hiddenCount = 0;
   }
@@ -120,8 +108,6 @@
         id: id,
         el: card,
         title: cardTitle(card),
-        hrefs: collectHrefs(card),
-        text: card.textContent || "",
       });
     }
     return cards;

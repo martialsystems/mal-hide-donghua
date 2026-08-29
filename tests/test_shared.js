@@ -22,7 +22,6 @@ assert.strictEqual(S.malIdFromHref(null), 0);
 
 section("malIdFromPath");
 assert.strictEqual(S.malIdFromPath("/anime/44074"), 44074);
-assert.strictEqual(S.malIdFromPath("/anime/44074/Shiguang_Dailiren"), 44074);
 assert.strictEqual(S.malIdFromPath("/anime/64875/Niu_Lai"), 64875);
 assert.strictEqual(S.malIdFromPath("/anime/season"), 0);
 assert.strictEqual(S.malIdFromPath("/anime.php"), 0);
@@ -40,94 +39,28 @@ assert.strictEqual(S.isListingPath("/anime/64875/Niu_Lai/characters"), false);
 assert.strictEqual(S.isListingPath("/animelist/someone"), false);
 assert.strictEqual(S.isListingPath("/"), false);
 
-section("titleSignal");
-[
-  "Shiguang Dailiren III",
-  "Zhu Xian: Zuizhong Ji",
-  "Hua Xianzi: Mofa Xiang Dui Lun",
-  "Lian Qi Shi Wan Nian Special: Yangji Tianxia",
-  "Bai Ri Cheng Wang",
-  "Yi Nian Yong Heng: Wanjie Ji",
-  "Qu Ni de Dao",
-  "Tudou Xia: Wo Yao Dang Da Xia",
-  "Baxian!",
-  "Wukong Da Sheng",
-  "Jiyi Guanli Ju (2026)",
-  "Sanguo Di Yi Bu: Zheng Luoyang",
-  "Niu Lai",
-  "时光代理人III",
-].forEach(function (t) {
-  assert.strictEqual(S.titleSignal(t), "cn", t);
-});
-[
-  "Mushoku Tensei III: Isekai Ittara Honki Dasu",
-  "Youjo Senki II",
-  "Jujutsu Kaisen",
-  "Sousou no Frieren",
-  "Shingeki no Kyojin",
-  "One Piece",
-  "Chiikawa",
-  "Boku no Hero Academia: I Am a Hero Too",
-  "Hell's Paradise",
-  "Cowboy Bebop",
-  "Steins;Gate",
-  "Naruto",
-  "To Be Hero X",
-  "The Ribbon Hero",
-  "Youkoso Ninchishou Sekai e",
-  "One Piece",
-].forEach(function (t) {
-  assert.notStrictEqual(S.titleSignal(t), "cn", t);
-});
-assert.strictEqual(S.titleSignal("Sousou no Frieren"), "jp");
-assert.strictEqual(S.titleSignal("Jujutsu Kaisen"), "unknown");
-assert.strictEqual(S.nativeSignal("时光代理人III"), "cn");
-assert.strictEqual(S.nativeSignal("地獄楽"), "unknown");
-assert.strictEqual(S.nativeSignal("呪術廻戦"), "unknown");
-assert.strictEqual(S.nativeSignal("進撃の巨人"), "jp");
+section("looksJapanese");
+assert.strictEqual(S.looksJapanese("Sousou no Frieren"), true);
+assert.strictEqual(S.looksJapanese("Shingeki no Kyojin"), true);
+assert.strictEqual(S.looksJapanese("Jujutsu Kaisen"), true);
+assert.strictEqual(S.looksJapanese("Youjo Senki II"), true);
+assert.strictEqual(S.looksJapanese("Mushoku Tensei III: Isekai Ittara Honki Dasu"), true);
+assert.strictEqual(S.looksJapanese("進撃の巨人"), true);
+assert.strictEqual(S.looksJapanese("Niu Lai"), false);
+assert.strictEqual(S.looksJapanese("To Be Hero X"), false);
+assert.strictEqual(S.looksJapanese(""), false);
 
 section("decideHide");
-assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren III", enabled: true }), true);
-assert.strictEqual(S.decideHide({ title: "Mushoku Tensei III: Isekai Ittara Honki Dasu", enabled: true }), false);
-assert.strictEqual(S.decideHide({ title: "To Be Hero X", enabled: true }), false);
-assert.strictEqual(S.decideHide({ title: "To Be Hero X", country: "CN", enabled: true }), true);
-assert.strictEqual(
-  S.decideHide({ title: "Shiguang Dailiren III", country: "JP", enabled: true }),
-  false
-);
-assert.strictEqual(S.decideHide({ title: "Jujutsu Kaisen", country: "JP", enabled: true }), false);
-assert.strictEqual(
-  S.decideHide({
-    title: "Jujutsu Kaisen",
-    hrefs: ["https://baike.baidu.com/item/jujutsu", "https://movie.douban.com/subject/1"],
-    enabled: true,
-  }),
-  false
-);
-assert.strictEqual(
-  S.decideHide({
-    title: "To Be Hero X",
-    hrefs: ["https://www.bilibili.com/bangumi/media/md1"],
-    enabled: true,
-  }),
-  true
-);
-assert.strictEqual(
-  S.decideHide({
-    title: "Shiguang Dailiren III",
-    text: "(Source: Bilibili, translated)",
-    enabled: true,
-  }),
-  true
-);
 assert.strictEqual(S.decideHide({ title: "Niu Lai", enabled: true }), true);
-assert.strictEqual(S.decideHide({ title: "Dogulwang", country: "KR", enabled: true }), true);
-assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren III", enabled: false }), false);
-assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren III", allowed: true, enabled: true }), false);
-assert.strictEqual(S.isStrongChineseHost("https://www.bilibili.com/bangumi/media/md1"), true);
-assert.strictEqual(S.isStrongChineseHost("https://v.qq.com/x/cover/foo"), true);
-assert.strictEqual(S.isStrongChineseHost("https://baike.baidu.com/item/foo"), false);
-assert.strictEqual(S.isStrongChineseHost("https://movie.douban.com/subject/1"), false);
+assert.strictEqual(S.decideHide({ title: "To Be Hero X", enabled: true }), true);
+assert.strictEqual(S.decideHide({ title: "Jujutsu Kaisen", enabled: true }), false);
+assert.strictEqual(S.decideHide({ title: "Youjo Senki II", enabled: true }), false);
+assert.strictEqual(S.decideHide({ title: "Mushoku Tensei III: Isekai Ittara Honki Dasu", enabled: true }), false);
+assert.strictEqual(S.decideHide({ title: "One Piece", country: "JP", enabled: true }), false);
+assert.strictEqual(S.decideHide({ title: "One Piece", country: "KR", enabled: true }), true);
+assert.strictEqual(S.decideHide({ title: "To Be Hero X", country: "CN", enabled: true }), true);
+assert.strictEqual(S.decideHide({ title: "Niu Lai", country: "JP", enabled: true }), false);
+assert.strictEqual(S.decideHide({ title: "Niu Lai", enabled: false }), false);
 
 section("pickCardFromChain");
 assert.strictEqual(
@@ -215,7 +148,11 @@ assert.strictEqual(S.cacheGet(twice, 40748, now + 1).c, "JP");
 assert.strictEqual(S.cacheGet(twice, 44074, now + S.KNOWN_TTL_MS + 5), null);
 
 section("chunkIds");
-assert.deepStrictEqual(S.chunkIds([1, 2, 3, 4, 5], 2), [[1, 2], [3, 4], [5]]);
+assert.deepStrictEqual(S.chunkIds([1, 2, 3, 4, 5], 2), [
+  [1, 2],
+  [3, 4],
+  [5],
+]);
 assert.deepStrictEqual(S.uniqueIds([1, 1, 0, -3, 2, 2]), [1, 2]);
 
 section("parseSettings");

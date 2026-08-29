@@ -12,7 +12,7 @@ try {
   /* unit syntax checks have no importScripts */
 }
 
-var S = self.MalHideDonghua;
+var S = self.MalJpOnly;
 var writeChain = Promise.resolve();
 
 function loadSettings() {

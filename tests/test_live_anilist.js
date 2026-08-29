@@ -47,10 +47,10 @@ function post(body) {
   var ids = [44074, 40748, 21, 56752];
   var json = await post(S.lookupBody(ids));
   var map = S.fillMissing(ids, S.parseLookupResponse(json));
-  assert.strictEqual(map["44074"], "CN", "Link Click origin");
-  assert.strictEqual(map["56752"], "CN", "Link Click Bridon origin");
-  assert.strictEqual(map["40748"], "JP", "Jujutsu Kaisen origin");
-  assert.strictEqual(map["21"], "JP", "One Piece origin");
+  assert.strictEqual(map["40748"], "JP");
+  assert.strictEqual(map["21"], "JP");
+  assert.notStrictEqual(map["44074"], "JP");
+  assert.notStrictEqual(map["56752"], "JP");
   assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren", country: map["44074"], enabled: true }), true);
   assert.strictEqual(S.decideHide({ title: "Jujutsu Kaisen", country: map["40748"], enabled: true }), false);
   assert.strictEqual(S.decideHide({ title: "One Piece", country: map["21"], enabled: true }), false);

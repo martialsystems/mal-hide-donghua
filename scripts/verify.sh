@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Interaction-path checks for Hide Donghua.
+# Interaction-path checks for Japanese Only.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -26,6 +26,7 @@ node -e '
 const fs = require("fs");
 const m = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 if (m.manifest_version !== 3) throw new Error("not MV3");
+if (m.name !== "Japanese Only") throw new Error("name");
 if (!m.background || m.background.service_worker !== "src/background.js") {
   throw new Error("service worker path");
 }
@@ -85,20 +86,10 @@ if grep -q 'malIdFromHref' src/content.js && grep -q 'classifyNode' src/content.
 else
   bad "content.js bypasses shared helpers"
 fi
-if grep -q 'titleSignal' src/shared.js && grep -q 'isStrongChineseHost' src/shared.js && grep -q 'pinyinUnique' src/shared.js; then
-  ok "title language and strong-host helpers present"
+if grep -q 'looksJapanese' src/shared.js && grep -q 'looksJapanese' tests/test_shared.js; then
+  ok "Japanese title cue helper present"
 else
-  bad "title/host helpers missing"
-fi
-if grep -q 'baike.baidu.com' tests/test_shared.js && grep -q 'movie.douban.com' tests/test_shared.js; then
-  ok "Baidu/Douban wiki links are tested as non-hiding"
-else
-  bad "Baidu/Douban non-hide untested"
-fi
-if grep -q 'Youkoso Ninchishou Sekai e' tests/test_shared.js && grep -q 'Youjo Senki II' tests/test_shared.js; then
-  ok "Japanese titles asserted not hidden from pinyin"
-else
-  bad "Japanese title safety untested"
+  bad "looksJapanese missing"
 fi
 if grep -q 'document_end' manifest.json; then
   ok "content script runs at document_end"
@@ -110,11 +101,6 @@ if grep -q 'writeChain' src/background.js && grep -q 'mergeCache' src/background
 else
   bad "serialized write path missing"
 fi
-if grep -q 'allowChain' src/background.js || grep -q 'ALLOW_PAGE' src/*.js; then
-  bad "title-page allow path must be gone"
-else
-  ok "no title-page allow path"
-fi
 if grep -q 'lookupBody' src/background.js && grep -q 'parseLookupResponse' src/background.js; then
   ok "background uses production AniList parse"
 else
@@ -125,15 +111,10 @@ if grep -q 'graphql.anilist.co' src/shared.js src/background.js docs/PRIVACY_POL
 else
   bad "AniList destination missing from privacy/readme"
 fi
-if grep -q 'BLOCKED = { CN: true, TW: true, HK: true, KR: true }' src/shared.js; then
-  ok "blocked set is CN/TW/HK/KR"
+if grep -q 'MalJpOnly' src/shared.js src/background.js src/content.js src/popup.js; then
+  ok "shared global is MalJpOnly"
 else
-  bad "blocked set drifted"
-fi
-if grep -q 'KEEP_COUNTRY = { JP: true }' src/shared.js; then
-  ok "only JP is kept"
-else
-  bad "JP keep-set drifted"
+  bad "MalJpOnly not wired"
 fi
 if grep -q 'isListingPath' src/shared.js src/content.js tests/test_shared.js; then
   ok "listing-only hide is wired"
@@ -141,11 +122,11 @@ else
   bad "isListingPath missing"
 fi
 if grep -q 'Niu Lai' tests/test_shared.js; then
-  ok "Niu Lai is a hide title"
+  ok "non-Japanese title hide is tested"
 else
   bad "Niu Lai untested"
 fi
-if grep -q 'malhd-hide' src/content.js src/content.css; then
+if grep -q 'maljp-hide' src/content.js src/content.css; then
   ok "card hide present"
 else
   bad "hide CSS/class missing"
@@ -164,6 +145,32 @@ if grep -q '/manga/' tests/test_shared.js; then
   ok "manga hrefs excluded"
 else
   bad "manga exclusion untested"
+fi
+
+say "== no country-target copy =="
+if python3 - <<'PY'
+from pathlib import Path
+needles = ("donghua", "pinyin", "bilibili", "tencent", "baidu", "douban", "youku", "iqiyi", "hide donghua")
+paths = [
+    Path("README.md"), Path("popup.html"), Path("NOTICE"), Path("LICENSE"),
+    Path("manifest.json"), Path("docs/PRIVACY_POLICY.md"), Path("docs/TERMS_OF_USE.md"),
+    Path("src/shared.js"), Path("src/content.js"), Path("src/popup.js"), Path("src/background.js"),
+]
+bad = []
+for p in paths:
+    text = p.read_text(encoding="utf-8").lower()
+    for n in needles:
+        if n in text:
+            bad.append(f"{p}: {n}")
+if bad:
+    print("\n".join(bad))
+    raise SystemExit(1)
+print("clean")
+PY
+then
+  ok "product copy has no country-target hide list"
+else
+  bad "country-target hide copy still present"
 fi
 
 say "== prose (no decorative dashes) =="

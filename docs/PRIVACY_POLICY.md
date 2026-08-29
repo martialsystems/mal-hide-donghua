@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Hide Donghua** (the “Extension”)
+**Japanese Only** (the “Extension”)
 
 **Effective date:** August 29, 2026
 **Last updated:** August 29, 2026
@@ -36,9 +36,9 @@ This Policy applies only to the Extension as an unpacked build you install yours
 
 On your device the Extension may:
 
-- Read **titles, native-title fields, and links** on MyAnimeList pages to classify language and Chinese streaming hosts;
+- Read **titles** on MyAnimeList listing pages for Japanese language cues;
 - Read **MyAnimeList anime ids** from links and the current URL;
-- Send those ids to **AniList GraphQL** (`https://graphql.anilist.co/`) to read `countryOfOrigin` (Japanese origin unhides a bad title match; Chinese origin hides English-titled donghua);
+- Send those ids to **AniList GraphQL** (`https://graphql.anilist.co/`) to read `countryOfOrigin`;
 - Keep id to country pairs in **`chrome.storage.local`** so the same titles are not looked up on every scan;
 - Keep the on/off flag in **`chrome.storage.sync`**.
 
@@ -50,7 +50,7 @@ We do not collect accounts, passwords, payment data, geolocation, or advertising
 
 | Permission | Why |
 |------------|-----|
-| `storage` | Remember on/off, the origin cache, and session allows |
+| `storage` | Remember on/off and the origin cache |
 | Host access to `myanimelist.net` | Run the content script that hides listings |
 | Host access to `graphql.anilist.co` | Look up country of origin by MAL id |
 

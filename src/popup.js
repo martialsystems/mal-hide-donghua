@@ -2,12 +2,12 @@
  * Copyright (c) 2026 Martial Systems LLC. All rights reserved.
  * https://martialsys.net/
  *
- * Toolbar popup. One on/off for hiding Chinese animation on MAL.
+ * Toolbar popup. One on/off for Japanese-only listings on MAL.
  */
 (function () {
   "use strict";
 
-  var S = window.MalHideDonghua;
+  var S = window.MalJpOnly;
   if (!S) return;
 
   var enableBox = document.getElementById("enable");

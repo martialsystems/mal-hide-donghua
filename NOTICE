@@ -1,4 +1,4 @@
-Hide Donghua
+Japanese Only
 Copyright (c) 2026 Martial Systems LLC. All rights reserved.
 
 Proprietary product of Martial Systems LLC.
@@ -9,8 +9,8 @@ Optional: https://ko-fi.com/martialgames
 
 We do not save your data. The on/off flag is stored in Chrome sync
 storage on your profile. MAL id to country cache is stored in Chrome
-local storage. Titles and links are classified on the device. Page HTML
-is not uploaded to Martial Systems LLC. Lookups of MAL ids go to AniList
-(graphql.anilist.co). See docs/PRIVACY_POLICY.md.
+local storage. Page HTML is not uploaded to Martial Systems LLC.
+Lookups of MAL ids go to AniList (graphql.anilist.co). See
+docs/PRIVACY_POLICY.md.
 
 Not affiliated with Google LLC, MyAnimeList, or AniList.

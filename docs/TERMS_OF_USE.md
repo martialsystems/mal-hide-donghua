@@ -1,6 +1,6 @@
 # Terms of Use
 
-**Hide Donghua**
+**Japanese Only**
 
 **Effective date:** August 29, 2026
 **Developer:** Martial Systems LLC
@@ -20,9 +20,8 @@ THE EXTENSION IS PROVIDED "AS IS". Martial Systems LLC disclaims all
 warranties, express or implied, including merchantability and fitness
 for a particular purpose.
 
-Origin comes from AniList. Titles AniList does not map stay visible.
-MyAnimeList markup can change and miss a layout until the Extension is
-updated.
+Origin comes from AniList. MyAnimeList markup can change and miss a
+layout until the Extension is updated.
 
 ## Limitation of liability
 
