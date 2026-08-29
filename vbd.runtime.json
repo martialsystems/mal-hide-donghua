@@ -1,0 +1,9 @@
+{
+  "runtime_checks": [
+    {
+      "id": "verify",
+      "argv": ["./scripts/verify.sh"],
+      "timeout_s": 60
+    }
+  ]
+}

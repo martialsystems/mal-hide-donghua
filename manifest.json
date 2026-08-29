@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Hide Donghua",
+  "version": "1.0.0",
+  "description": "Hides Chinese animation on MyAnimeList. Origin from AniList. By Martial Systems LLC. We do not save your data.",
+  "author": "Martial Systems LLC",
+  "homepage_url": "https://martialsys.net/",
+  "minimum_chrome_version": "113",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://myanimelist.net/*",
+    "https://www.myanimelist.net/*",
+    "https://graphql.anilist.co/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Hide Donghua",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://myanimelist.net/*", "https://www.myanimelist.net/*"],
+      "js": ["src/shared.js", "src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

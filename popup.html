@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hide Donghua</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        width: 280px;
+        font: 13px/1.45 system-ui, sans-serif;
+        color: #202124;
+        background: #fff;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #e8eaed;
+          background: #202124;
+        }
+        .hint {
+          color: #9aa0a6;
+        }
+      }
+      .setting {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 0;
+        padding: 12px 14px 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .setting input {
+        margin: 3px 0 0;
+      }
+      .hint {
+        margin: 0;
+        padding: 0 14px 10px;
+        color: #5f6368;
+        font-size: 12px;
+      }
+      a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <label class="setting">
+      <input type="checkbox" id="enable" />
+      <span>Hide Chinese animation</span>
+    </label>
+    <p id="status" class="hint"></p>
+    <p class="hint">
+      On MyAnimeList, listings whose AniList origin is China, Taiwan, or Hong
+      Kong are hidden. Unmapped titles stay visible. We do not save your list.
+    </p>
+    <p class="hint">
+      © 2026 Martial Systems LLC ·
+      <a href="https://martialsys.net/">martialsys.net</a> ·
+      <a href="https://ko-fi.com/martialgames">Ko-fi</a>
+    </p>
+    <script src="src/shared.js"></script>
+    <script src="src/popup.js"></script>
+  </body>
+</html>
