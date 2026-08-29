@@ -36,8 +36,9 @@ This Policy applies only to the Extension as an unpacked build you install yours
 
 On your device the Extension may:
 
+- Read **titles, native-title fields, and links** on MyAnimeList pages to classify language and Chinese streaming hosts;
 - Read **MyAnimeList anime ids** from links and the current URL;
-- Send those ids to **AniList GraphQL** (`https://graphql.anilist.co/`) to read `countryOfOrigin`;
+- Send those ids to **AniList GraphQL** (`https://graphql.anilist.co/`) to read `countryOfOrigin` (Japanese origin unhides a bad title match; Chinese origin hides English-titled donghua);
 - Keep id to country pairs in **`chrome.storage.local`** so the same titles are not looked up on every scan;
 - Keep the on/off flag in **`chrome.storage.sync`**;
 - Keep “Show this page” ids in **`chrome.storage.session`** until Chrome exits.

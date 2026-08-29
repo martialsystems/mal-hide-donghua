@@ -13,10 +13,10 @@
 | **Publisher** | Martial Systems LLC |
 | **Support** | martialsys@gmail.com · [Ko-fi](https://ko-fi.com/martialgames) |
 | **Web** | https://martialsys.net/ |
-| **Version** | 1.0.0 |
+| **Version** | 1.1.0 |
 | **License** | Proprietary: see [LICENSE](LICENSE) and [Terms](docs/TERMS_OF_USE.md) |
 
-**We do not save your data.** Your list and page HTML are not uploaded to Martial Systems LLC. MAL ids are sent to AniList (`https://graphql.anilist.co/`) to read `countryOfOrigin`. On/off and the id cache stay in your Chrome profile. [Privacy Policy](docs/PRIVACY_POLICY.md).
+**We do not save your data.** Your list and page HTML are not uploaded to Martial Systems LLC. Titles and links are classified on your device. MAL ids are sent to AniList (`https://graphql.anilist.co/`) so Japanese origin can unhide a bad title match, and so English-titled donghua still hide. [Privacy Policy](docs/PRIVACY_POLICY.md).
 
 Not affiliated with Google LLC, MyAnimeList, or AniList.
 
@@ -26,13 +26,22 @@ Not affiliated with Google LLC, MyAnimeList, or AniList.
 2. Turn on **Developer mode**
 3. **Load unpacked** and choose this folder
 4. Open [MyAnimeList](https://myanimelist.net/)
-5. Seasonal, Top, Search, home sliders, and title pages hide CN / TW / HK origins
+5. Reload the tab. Seasonal tiles with pinyin titles (Shiguang Dailiren, Zhu Xian, and the rest) disappear immediately.
 
 Toolbar popup: **Hide Chinese animation**. Off leaves the page as MAL shows it. On a hidden title page, **Show this page** keeps that id visible until Chrome exits.
 
 ## What it does
 
-MAL has no country filter. AniList does (`CN`, `TW`, `HK`, `JP`, `KR`). The Extension reads MAL anime ids from `/anime/{id}` links, asks AniList, and hides the listing card when origin is China, Taiwan, or Hong Kong.
+Hide if any of these fire, unless AniList says Japan or Korea:
+
+| Signal | When |
+|--------|------|
+| Title language | Simplified Chinese in the title, or a pinyin title (`Shiguang Dailiren`, `Zhu Xian`) |
+| Strong Chinese hosts | Official/streaming links to Bilibili, Tencent Video (`v.qq.com`), iQIYI, Youku, WeTV |
+| Card text | `Bilibili` / `Tencent` / `iQIYI` / `Youku` in the tile (synopsis source line) |
+| AniList origin | `CN` / `TW` / `HK` for English titles such as To Be Hero X |
+
+AniList `JP` or `KR` always wins, so a bad pinyin read of a Japanese title comes back. Baidu Baike and Douban wiki links are ignored: Japanese title pages often have those.
 
 | Surface | Behavior |
 |---------|----------|
@@ -42,9 +51,6 @@ MAL has no country filter. AniList does (`CN`, `TW`, `HK`, `JP`, `KR`). The Exte
 | Home / rec sliders | `li.btn-anime` hidden |
 | Your list rows | `.list-table-data` hidden |
 | Title page | `#content` hidden, with Show this page |
-| Manga / manhua | Ignored |
-| Korean aeni | Left visible |
-| Id missing on AniList | Left visible |
 
 ## Checks
 
@@ -54,7 +60,8 @@ MAL has no country filter. AniList does (`CN`, `TW`, `HK`, `JP`, `KR`). The Exte
 
 ## Residual limits
 
-- First visit of an uncached id waits on AniList; the card can flash once.
+- English-titled donghua wait on AniList (To Be Hero X, The Ribbon Hero).
+- A few pinyin titles with no q/x/zh/ong/uan syllable wait on AniList too (Yao Shen Ji).
 - Co-productions use the one country AniList stores.
 - Forum text links are not listing cards, so they stay.
-- MAL markup changes can miss a layout until selectors are updated.
+- After Load unpacked, reload the MAL tab so the content script attaches.

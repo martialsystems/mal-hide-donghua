@@ -80,10 +80,30 @@ if grep -n 'innerHTML' src/*.js popup.html; then
 else
   ok "no innerHTML"
 fi
-if grep -q 'malIdFromHref' src/content.js && grep -q 'classifyNode' src/content.js && grep -q 'shouldHide' src/content.js; then
+if grep -q 'malIdFromHref' src/content.js && grep -q 'classifyNode' src/content.js && grep -q 'decideHide' src/content.js; then
   ok "content uses production id/card/hide helpers"
 else
   bad "content.js bypasses shared helpers"
+fi
+if grep -q 'titleSignal' src/shared.js && grep -q 'isStrongChineseHost' src/shared.js && grep -q 'pinyinUnique' src/shared.js; then
+  ok "title language and strong-host helpers present"
+else
+  bad "title/host helpers missing"
+fi
+if grep -q 'baike.baidu.com' tests/test_shared.js && grep -q 'movie.douban.com' tests/test_shared.js; then
+  ok "Baidu/Douban wiki links are tested as non-hiding"
+else
+  bad "Baidu/Douban non-hide untested"
+fi
+if grep -q 'Youkoso Ninchishou Sekai e' tests/test_shared.js && grep -q 'Youjo Senki II' tests/test_shared.js; then
+  ok "Japanese titles asserted not hidden from pinyin"
+else
+  bad "Japanese title safety untested"
+fi
+if grep -q 'document_end' manifest.json; then
+  ok "content script runs at document_end"
+else
+  bad "document_end missing"
 fi
 if grep -q 'writeChain' src/background.js && grep -q 'mergeCache' src/background.js && grep -q 'allowChain' src/background.js; then
   ok "cache and allow writes serialized"
@@ -105,7 +125,7 @@ if grep -q 'BLOCKED = { CN: true, TW: true, HK: true }' src/shared.js; then
 else
   bad "blocked set drifted"
 fi
-if grep -n 'KR: true' src/shared.js; then
+if grep -n 'BLOCKED = {.*KR' src/shared.js; then
   bad "Korean is not in the default hide set"
 else
   ok "KR not default-blocked"

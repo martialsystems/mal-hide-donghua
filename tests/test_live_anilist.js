@@ -51,10 +51,10 @@ function post(body) {
   assert.strictEqual(map["56752"], "CN", "Link Click Bridon origin");
   assert.strictEqual(map["40748"], "JP", "Jujutsu Kaisen origin");
   assert.strictEqual(map["21"], "JP", "One Piece origin");
-  var hide = S.idsToHide(ids, map, { enabled: true }, {});
-  assert.deepStrictEqual(hide, [44074, 56752]);
-  var off = S.idsToHide(ids, map, { enabled: false }, {});
-  assert.deepStrictEqual(off, []);
+  assert.strictEqual(S.decideHide({ title: "Shiguang Dailiren", country: map["44074"], enabled: true }), true);
+  assert.strictEqual(S.decideHide({ title: "Jujutsu Kaisen", country: map["40748"], enabled: true }), false);
+  assert.strictEqual(S.decideHide({ title: "One Piece", country: map["21"], enabled: true }), false);
+  assert.strictEqual(S.decideHide({ title: "Jujutsu Kaisen", country: map["40748"], enabled: false }), false);
   console.log("live anilist ok", map);
 })().catch(function (err) {
   console.error(err);

@@ -1,4 +1,7 @@
-.malhd-hide {
+.malhd-hide,
+div.seasonal-anime.malhd-hide,
+tr.malhd-hide,
+li.malhd-hide {
   display: none !important;
 }
 

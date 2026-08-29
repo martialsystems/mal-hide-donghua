@@ -2,8 +2,9 @@
  * Copyright (c) 2026 Martial Systems LLC. All rights reserved.
  * https://martialsys.net/
  *
- * Isolated world: find MAL anime ids on the page, look up AniList origin,
- * hide Chinese animation cards. Fail open if origin is unknown.
+ * Isolated world: hide Chinese animation cards from the title language and
+ * strong Chinese hosts immediately, then let AniList JP/KR unhide mistakes
+ * and AniList CN catch English titles. Fail open when unknown.
  */
 (function () {
   "use strict";
@@ -54,10 +55,51 @@
     return null;
   }
 
-  function knownHide(id) {
-    var c = originOf(id);
-    if (c == null) return false;
-    return S.shouldHide(c, settings, !!allow[String(id)]);
+  function cardTitle(el) {
+    var node = el.querySelector(
+      ".js-title, .link-title, .h2_anime_title a, .h2_anime_title, .h3_character_name, h2 a, h3 a, h2, h3"
+    );
+    return node && node.textContent ? node.textContent.trim() : "";
+  }
+
+  function collectHrefs(root) {
+    var hrefs = [];
+    if (!root || !root.querySelectorAll) return hrefs;
+    var links = root.querySelectorAll("a[href]");
+    for (var i = 0; i < links.length; i++) {
+      hrefs.push(links[i].href || links[i].getAttribute("href") || "");
+    }
+    return hrefs;
+  }
+
+  function nativeFromPage() {
+    var labels = document.querySelectorAll(".dark_text");
+    for (var i = 0; i < labels.length; i++) {
+      var t = (labels[i].textContent || "").replace(/\s+/g, " ").trim();
+      if (t.indexOf("Japanese:") !== 0) continue;
+      var parent = labels[i].parentNode;
+      if (!parent || !parent.textContent) return "";
+      return parent.textContent.replace(/Japanese:/, "").trim();
+    }
+    return "";
+  }
+
+  function pageTitle() {
+    var h = document.querySelector("h1.title-name, h1 strong, h1");
+    return h && h.textContent ? h.textContent.trim() : "";
+  }
+
+  function hideOpts(id, meta) {
+    meta = meta || {};
+    return {
+      enabled: settings.enabled,
+      allowed: !!allow[String(id)],
+      country: originOf(id),
+      title: meta.title || "",
+      nativeTitle: meta.nativeTitle || "",
+      hrefs: meta.hrefs || [],
+      text: meta.text || "",
+    };
   }
 
   function send(msg) {
@@ -106,7 +148,15 @@
   }
 
   function applyPage(id) {
-    var hide = knownHide(id);
+    var side = document.querySelector(".leftside") || document.getElementById("content");
+    var hide = S.decideHide(
+      hideOpts(id, {
+        title: pageTitle(),
+        nativeTitle: nativeFromPage(),
+        hrefs: collectHrefs(side || document),
+        text: "",
+      })
+    );
     pageHidden = hide;
     document.documentElement.classList.toggle("malhd-page-hide", hide);
     if (hide) ensureBar(id);
@@ -127,7 +177,13 @@
         if (seen.has(card)) continue;
         seen.add(card);
       }
-      cards.push({ id: id, el: card });
+      cards.push({
+        id: id,
+        el: card,
+        title: cardTitle(card),
+        hrefs: collectHrefs(card),
+        text: card.textContent || "",
+      });
     }
     return cards;
   }
@@ -136,7 +192,7 @@
     var n = 0;
     mutating = true;
     for (var i = 0; i < cards.length; i++) {
-      var hide = knownHide(cards[i].id);
+      var hide = S.decideHide(hideOpts(cards[i].id, cards[i]));
       setHidden(cards[i].el, hide);
       if (hide) n += 1;
     }
